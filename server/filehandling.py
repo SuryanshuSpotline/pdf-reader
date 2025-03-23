@@ -1,32 +1,25 @@
 import os
-import json
-from google.oauth2.service_account import Credentials
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseUpload
+import logging
+import requests
+from dotenv import load_dotenv
 
-google_creds = json.loads(os.getenv("GOOGLE_SERVICE_ACCOUNT"))
-credentials = service_account.Credentials.from_service_account_info(google_creds)
+load_dotenv()
+API_KEY = os.getenv("ADOBE_CLIENT_ID")
+url = "https://pdf-services.adobe.io/assets"
 
-SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
-def upload_to_drive(file):
+def upload_pdf_to_adobe(file):
     try:
-        service = build("drive", "v3", credentials=credentials)
-        file_name = file.filename
-        file_metadata = {"name": file_name}
-        media = MediaIoBaseUpload(file, mimetype=file.content_type, resumable=True)
-        file_drive = service.files().create(body=file_metadata, media_body=media, fields="id").execute()
-        file_id = file_drive.get("id")
-        if file_id:
-            print(f"File uploaded successfully: {file_id}")
-            permission = {
-                    "type": "anyone",
-                    "role": "writer"
-                }
-            service.permissions().create(fileId=file_id, body=permission).execute()
-            print(f"Public edit access granted for file: {file_id}")
+        headers = {"Authorization": f"Bearer {API_KEY}","x-api-key": API_KEY}
+        files = {"file": file}
+        response = requests.post(url, headers=headers, files=files)
+        if response.status_code == 200:
+            logger.info("PDF uploaded successfully to Adobe Document Cloud")
+            file_id = response.json().get("assetID")
+            file_name = file.filename
             return file_id, file_name
     except Exception as e:
-        print("Error uploading file:", str(e))
+        logger.error("Failed to upload PDF: %s", response.text)
         return None

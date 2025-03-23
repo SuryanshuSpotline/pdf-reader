@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
-from filehandling import upload_to_drive
+from filehandling import upload_pdf_to_adobe
 
 app = Flask(__name__)
 CORS(app)
@@ -19,7 +18,7 @@ def upload():
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
 
-    file_id, file_name = upload_to_drive(file)
+    file_id, file_name = upload_pdf_to_adobe(file)
     if file_id:
         return jsonify({"message": "File uploaded successfully", "fileId": file_id, "fileName": file_name})
     else:
