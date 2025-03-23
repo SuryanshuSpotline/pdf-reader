@@ -22,6 +22,16 @@
     border: none;
 }
 
-.info-icon:hover {
+.info-icon:hover, .upload-icon:hover {
     color: #0056b3;
+}
+
+.upload-icon{
+    position: absolute;
+    top: 5px;
+    right: 110px;
+    cursor: pointer;
+    color: black;
+    padding: 8px;
+    border: none;
 }

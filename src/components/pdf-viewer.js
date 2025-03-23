@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import "./pdf-viewer.css";
 import { FaInfoCircle } from "react-icons/fa";
+import { FaFileUpload } from "react-icons/fa";
 
 const PdfViewerComponent = () => {
   useEffect(() => {
@@ -43,6 +44,9 @@ const PdfViewerComponent = () => {
       <div id="adobe-dc-view"></div>
       <div className="info-icon" selenium-name="doc-info">
         <FaInfoCircle size={24} title="More Information" />
+      </div>
+      <div className="upload-icon" selenium-name="file-upload">
+        <FaFileUpload size={24} title="Document Upload" />
       </div>
     </div>
   );
