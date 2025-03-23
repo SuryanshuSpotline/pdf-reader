@@ -44,9 +44,9 @@ const PdfViewerComponent = () => {
         className="fas fa-info-circle"
         style={{
           position: "absolute",
-          top: "18vh",
-          right: "0.8vw",
-          fontSize: "1.7vw",
+          top: "10px",
+          right: "80px",
+          fontSize: "24px",
           color: "black",
           cursor: "pointer",
         }}
