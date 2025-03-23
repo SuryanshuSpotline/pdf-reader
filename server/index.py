@@ -1,27 +1,33 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from filehandling import upload_pdf_to_adobe
+import logging
+from adobe_upload import upload_file_to_adobe
 
 app = Flask(__name__)
 CORS(app)
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 @app.route("/", methods=["GET"])
 def home():
-    return "Flask app is running!"
+    return jsonify({"message": "Adobe PDF Upload API is Running!"})
 
 @app.route("/upload", methods=["POST"])
 def upload():
     if "file" not in request.files:
-        return jsonify({"error": "No file part"}), 400
+        logger.warning("No file provided in request")
+        return jsonify({"error": "No file provided"}), 400
 
     file = request.files["file"]
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
 
-    file_id, file_name = upload_pdf_to_adobe(file)
+    file_id, file_name = upload_file_to_adobe(file)
     if file_id:
         return jsonify({"message": "File uploaded successfully", "fileId": file_id, "fileName": file_name})
     else:
+        logger.error("Upload failed")
         return jsonify({"error": "Upload failed"}), 500
 
 if __name__ == "__main__":
