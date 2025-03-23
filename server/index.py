@@ -19,9 +19,9 @@ def upload():
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
 
-    file_id = upload_to_drive(file)
+    file_id, file_name = upload_to_drive(file)
     if file_id:
-        return jsonify({"message": "File uploaded successfully", "fileId": file_id})
+        return jsonify({"message": "File uploaded successfully", "fileId": file_id, "fileName": file_name})
     else:
         return jsonify({"error": "Upload failed"}), 500
 
