@@ -21,7 +21,7 @@ def get_adobe_access_token():
             "client_id": ADOBE_CLIENT_ID,
             "client_secret": ADOBE_CLIENT_SECRET,
             "grant_type": "client_credentials",
-            "scope": "openid,AdobeID,read_organizations",
+            "scope": "openid, AdobeID, DCAPI",
         }
 
         response = requests.post(ADOBE_TOKEN_URL, data=data)
