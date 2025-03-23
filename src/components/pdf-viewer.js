@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+import "./pdf-viewer.css";
+import { FaInfoCircle } from "react-icons/fa";
 
 const PdfViewerComponent = () => {
   useEffect(() => {
@@ -38,21 +39,11 @@ const PdfViewerComponent = () => {
   }, []);
 
   return (
-    <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
-      <div id="adobe-dc-view" style={{ width: "100%", height: "100%" }}></div>
-      <i
-        className="fas fa-info-circle"
-        style={{
-          position: "absolute",
-          top: "10px",
-          right: "80px",
-          fontSize: "24px",
-          color: "black",
-          cursor: "pointer",
-        }}
-        title="This is an Info Icon"
-        onClick={() => alert("This is the PDF viewer.")}
-      ></i>
+    <div className="pdf-container">
+      <div id="adobe-dc-view"></div>
+      <div className="info-icon">
+        <FaInfoCircle size={24} title="More Information" />
+      </div>
     </div>
   );
 };
