@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-from upload import upload_to_drive
+from filehandling import upload_to_drive
 
 app = Flask(__name__)
 CORS(app)
