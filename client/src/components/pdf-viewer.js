@@ -22,7 +22,7 @@ const PdfViewerComponent = () => {
 
       adobeDCView.previewFile(
         {
-          content: { location: { url: "https://drive.usercontent.google.com/download?id=18ykVNOZLtx1nFcPFQ1kFveSvfQV0_9Xj&authuser=0&acrobatPromotionSource=GoogleDriveNativeView" } },
+          content: { location: { url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" } },
           metaData: { fileName: "Bodea Brochure.pdf" },
         },
         { embedMode: "FULL_WINDOW" }
