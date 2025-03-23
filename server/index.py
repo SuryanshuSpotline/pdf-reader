@@ -3,12 +3,14 @@ from flask_cors import CORS
 import os
 from upload import upload_to_drive
 
-
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/upload", methods=["POST"])
+@app.route("/", methods=["GET"])
+def home():
+    return "Flask app is running!"
 
+@app.route("/upload", methods=["POST"])
 def upload():
     if "file" not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -24,4 +26,4 @@ def upload():
         return jsonify({"error": "Upload failed"}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)
