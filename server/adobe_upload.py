@@ -21,7 +21,7 @@ def upload_file_to_adobe(file):
     
     headers = {
         "Authorization": f"Bearer {access_token}",
-        "x-api-key": "ADOBE_CLIENT_ID",
+        "x-api-key": ADOBE_CLIENT_ID,
         "Content-Type": "application/pdf",
     }
     file_name = file.filename
