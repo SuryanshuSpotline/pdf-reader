@@ -19,7 +19,7 @@
     cursor: pointer;
     color: black;
     padding: 8px;
-    border-radius: 50%;
+    border: none;
 }
 
 .info-icon:hover {

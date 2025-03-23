@@ -41,7 +41,7 @@ const PdfViewerComponent = () => {
   return (
     <div className="pdf-container">
       <div id="adobe-dc-view"></div>
-      <div className="info-icon">
+      <div className="info-icon" selenium-name="doc-info">
         <FaInfoCircle size={24} title="More Information" />
       </div>
     </div>
