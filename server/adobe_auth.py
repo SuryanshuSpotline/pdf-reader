@@ -1,9 +1,9 @@
 import os
 import logging
 import requests
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
-# load_dotenv()
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ def get_adobe_access_token():
 
         if response.status_code == 200:
             ADOBE_ACCESS_TOKEN = response.json().get("access_token")
-            logger.info("Successfully obtained Adobe Access Token.")
+            logger.info("Successfully obtained Adobe Access Token.", ADOBE_ACCESS_TOKEN)
         else:
             logger.error(f"Failed to get Adobe token: {response.text}")
             ADOBE_ACCESS_TOKEN = None

@@ -1,11 +1,17 @@
 import logging
 import requests
 from adobe_auth import get_token
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 ADOBE_UPLOAD_URL = "https://pdf-services.adobe.io/assets"
+ADOBE_CLIENT_ID = os.getenv("ADOBE_CLIENT_ID")
+ADOBE_CLIENT_SECRET = os.getenv("ADOBE_CLIENT_SECRET")
 
 def upload_file_to_adobe(file):
     access_token = get_token()
@@ -15,7 +21,7 @@ def upload_file_to_adobe(file):
     
     headers = {
         "Authorization": f"Bearer {access_token}",
-        "x-api-key": "your-adobe-client-id",
+        "x-api-key": "ADOBE_CLIENT_ID",
         "Content-Type": "application/pdf",
     }
     file_name = file.filename
