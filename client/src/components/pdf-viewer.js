@@ -57,6 +57,7 @@ const PdfViewerComponent = () => {
     if (uploadedFileUrl) {
       console.log("File uploaded successfully:", uploadedFileUrl);
       setFileUrl(uploadedFileUrl);
+      localStorage.setItem("pdfUrl", uploadedFileUrl);
     } else {
       console.error("File upload failed.");
     }
