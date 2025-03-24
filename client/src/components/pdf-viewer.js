@@ -4,7 +4,7 @@ import { FaInfoCircle, FaFileUpload } from "react-icons/fa";
 import { uploadFile } from "./file-upload";
 
 const PdfViewerComponent = () => {
-  const [fileUrl, setFileUrl] = useState(null);
+  const [fileUrl, setFileUrl] = useState(localStorage.getItem("pdfUrl") || null);
   const adobeClientId = process.env.REACT_APP_ADOBE_CLIENT_ID;
 
   useEffect(() => {
