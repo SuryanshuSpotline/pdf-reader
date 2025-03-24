@@ -6,6 +6,8 @@ import fs from "fs";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors({ origin: "*" }));
+
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
