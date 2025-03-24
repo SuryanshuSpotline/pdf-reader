@@ -25,6 +25,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+app.get("/", (req, res) => {
+  res.json({ message: "V-Assure PDF Reader API is running!" });
+});
+
 app.post("/upload", upload.single("pdf"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
