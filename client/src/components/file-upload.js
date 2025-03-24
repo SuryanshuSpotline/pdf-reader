@@ -6,13 +6,13 @@ export const uploadFile = async (file) => {
 
   try {
     const response = await axios.post(
-      "https://pdf-reader-server.vercel.app/upload",
+      "https://pdf-reader-9eok.onrender.com/upload",
       formData,
       { headers: { "Content-Type": "multipart/form-data" } }
     );
 
-    if (response.data.fileId) {
-      return `https://drive.google.com/uc?id=${response.data.fileId}`;
+    if (response.data.url) {
+      return `https://pdf-reader-9eok.onrender.com${response.data.url}`;
     } else {
       console.error("Upload failed.");
       return null;

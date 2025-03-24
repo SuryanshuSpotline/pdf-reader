@@ -41,5 +41,5 @@ app.post("/upload", upload.single("pdf"), (req, res) => {
 app.use("/uploads", express.static(uploadDir));
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
