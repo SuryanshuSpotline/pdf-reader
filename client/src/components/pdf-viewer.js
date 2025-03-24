@@ -22,7 +22,7 @@ const PdfViewerComponent = () => {
 
       adobeDCView.previewFile(
         {
-          content: { location: { url: "https://pdf-reader-9eok.onrender.com/uploads/1742833588772-170-report.pdf" } },
+          content: { location: { url: "https://pdf-reader-9eok.onrender.com/uploads/1742833955030-170-report.pdf" } },
           metaData: { fileName: "170-report.pdf" },
         },
         { embedMode: "FULL_WINDOW" }
