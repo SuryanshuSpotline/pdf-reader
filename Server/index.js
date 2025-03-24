@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import cors from "cors"; // Import CORS
 
 const app = express();
 const PORT = process.env.PORT || 3000;
