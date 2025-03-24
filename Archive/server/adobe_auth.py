@@ -28,7 +28,7 @@ def get_adobe_access_token():
 
         if response.status_code == 200:
             ADOBE_ACCESS_TOKEN = response.json().get("access_token")
-            logger.info("Successfully obtained Adobe Access Token.", ADOBE_ACCESS_TOKEN)
+            logger.info("Successfully obtained Adobe Access Token.")
         else:
             logger.error(f"Failed to get Adobe token: {response.text}")
             ADOBE_ACCESS_TOKEN = None

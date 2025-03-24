@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import logging
-from adobe_upload import upload_file_to_adobe
+from adobe_upload import upload_pdf_to_adobe
 
 app = Flask(__name__)
 CORS(app)
@@ -23,7 +23,15 @@ def upload():
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
 
-    file_id, file_name = upload_file_to_adobe(file)
+    upload_response = upload_pdf_to_adobe(file)
+
+    if "error" in upload_response:
+        logger.error("Upload failed: %s", upload_response["error"])
+        return jsonify({"error": "Upload failed", "details": upload_response["error"]}), 500
+
+    file_id = upload_response.get("assetID")
+    file_name = file.filename
+    
     if file_id:
         return jsonify({"message": "File uploaded successfully", "fileId": file_id, "fileName": file_name})
     else:
@@ -31,4 +39,4 @@ def upload():
         return jsonify({"error": "Upload failed"}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5001)
