@@ -22,7 +22,7 @@ const PdfViewerComponent = () => {
 
       adobeDCView.previewFile(
         {
-          content: { location: { url: "https://drive.google.com/uc?export=download&id=18ykVNOZLtx1nFcPFQ1kFveSvfQV0_9Xj" } },
+          content: { location: { url: "https://acrobatservices.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf" } },
           metaData: { fileName: "Bodea Brochure.pdf" },
         },
         { embedMode: "FULL_WINDOW" }
