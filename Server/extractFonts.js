@@ -56,18 +56,18 @@ const {
       const jsonData = zip.readAsText("structuredData.json");
       const data = JSON.parse(jsonData);
   
-      const fontsUsed = new Set();
+      const fontMap = new Map();
   
       data.elements.forEach((element) => {
         if (element.Font) {
-          fontsUsed.add(element.Font);
+          const fontString = JSON.stringify(element.Font);
+          fontMap.set(fontString, element.Font);
         }
       });
   
-      // Cleanup
-      fs.unlinkSync(tempOutputPath);
+      fs.unlinkSync(tempOutputPath); // Clean up temp file
   
-      return Array.from(fontsUsed);
+      return Array.from(fontMap.values());
     } catch (err) {
       console.error("Error during font extraction:", err);
       return [];
