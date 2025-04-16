@@ -3,6 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import cors from "cors";
+import extractFonts from "./extractFonts";  // Import the font extraction function
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,13 +30,28 @@ app.get("/", (req, res) => {
   res.json({ message: "V-Assure PDF Reader API is running!" });
 });
 
-app.post("/upload", upload.single("pdf"), (req, res) => {
+app.post("/upload", upload.single("pdf"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
 
   const fileUrl = `/uploads/${req.file.filename}`;
-  res.json({ url: fileUrl, originalName: req.file.originalname, });
+  const filePath = path.join(uploadDir, req.file.filename);
+  
+  try {
+    // Extract fonts from the uploaded PDF
+    const fonts = await extractFonts(filePath);
+
+    // Send the fonts data in the response
+    res.json({
+      url: fileUrl,
+      originalName: req.file.originalname,
+      fonts: fonts,  // Send the extracted fonts
+    });
+  } catch (error) {
+    console.error("Error extracting fonts:", error);
+    res.status(500).json({ error: "Failed to extract fonts from PDF" });
+  }
 });
 
 app.use("/uploads", express.static(uploadDir));
