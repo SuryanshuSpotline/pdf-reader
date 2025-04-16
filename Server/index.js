@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import cors from "cors";
-import extractFonts from "./extractFonts.js";  // Import the font extraction function
+import extractFontsFromPDF from "./extractFonts.js";  // Import the font extraction function
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -42,7 +42,7 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
   
   try {
     // Extract fonts from the uploaded PDF
-    const fonts = await extractFonts(filePath);
+    const fonts = await extractFontsFromPDF(filePath);
 
     // Send the fonts data in the response
     res.json({
