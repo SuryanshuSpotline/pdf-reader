@@ -4,7 +4,7 @@ import axios from 'axios';
 dotenv.config();
 
 export async function getAdobeAccessToken() {
-  const tokenEndpoint = 'https://api.adobe.io/auth/oauth/v2/token';
+  const tokenEndpoint = 'https://ims-na1.adobelogin.com/ims/token';
 
   const data = new URLSearchParams({
     client_id: process.env.ADOBE_CLIENT_ID,
