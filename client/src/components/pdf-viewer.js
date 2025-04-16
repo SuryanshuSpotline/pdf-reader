@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import "./pdf-viewer.css";
 import { FaInfoCircle, FaFileUpload } from "react-icons/fa";
 import { uploadFile } from "./file-upload";
+import { PDFDocument } from "pdf-lib";
 
 const PdfViewerComponent = () => {
   const [fileUrl, setFileUrl] = useState(localStorage.getItem("pdfUrl") || null);
   const [fileName, setFileName] = useState(localStorage.getItem("pdfName") || null);
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
+  const [fonts, setFonts] = useState([]);
   const adobeClientId = process.env.REACT_APP_ADOBE_CLIENT_ID;
 
   useEffect(() => {
@@ -22,7 +24,6 @@ const PdfViewerComponent = () => {
         return;
       }
 
-      console.log("Adobe SDK Loaded, Initializing Viewer...");
       const adobeDCView = new window.AdobeDC.View({
         clientId: adobeClientId,
         divId: "adobe-dc-view",
@@ -62,6 +63,54 @@ const PdfViewerComponent = () => {
       setFileName(uploadedFile.name);
       localStorage.setItem("pdfUrl", uploadedFile.url);
       localStorage.setItem("pdfName", uploadedFile.name);
+
+      // Load file locally to extract fonts
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const typedArray = new Uint8Array(reader.result);
+        const pdfDoc = await PDFDocument.load(typedArray);
+        const fontSet = new Set();
+        const fontsList = [];
+
+        const pages = pdfDoc.getPages();
+        for (const page of pages) {
+          const dict = page.node.Resources();
+          const fontsDict = dict.lookup("Font");
+          if (!fontsDict) continue;
+
+          fontsDict.entries().forEach(([key, value]) => {
+            const fontRef = value;
+            const fontDict = fontRef.lookupMaybe("BaseFont") ? fontRef : fontRef.lookupMaybe("FontDescriptor");
+
+            if (fontDict && fontDict.dict) {
+              const fontName = fontRef.lookupMaybe("BaseFont")?.name ?? "Unknown";
+              const fontType = fontRef.lookupMaybe("Subtype")?.name ?? "Unknown";
+              const encoding = fontRef.lookupMaybe("Encoding")?.name ?? "Unknown";
+
+              const actualFont = fontDict.lookupMaybe("FontName")?.name ?? "Unknown";
+              const actualFontType = fontDict.lookupMaybe("FontFile2")
+                ? "TrueType"
+                : fontDict.lookupMaybe("FontFile3")
+                ? "Type1 or CID"
+                : "Unknown";
+
+              const fontKey = `${fontName}-${actualFont}`;
+              if (!fontSet.has(fontKey)) {
+                fontSet.add(fontKey);
+                fontsList.push({
+                  fontName,
+                  type: fontType,
+                  encoding,
+                  actualFont,
+                  actualFontType,
+                });
+              }
+            }
+          });
+        }
+        setFonts(fontsList);
+      };
+      reader.readAsArrayBuffer(selectedFile);
     } else {
       console.error("File upload failed.");
     }
@@ -108,13 +157,29 @@ const PdfViewerComponent = () => {
             <div className="tab-content">
               {activeTab === "description" && (
                 <div>
-                  <p>This is the description of the uploaded PDF.</p>
                   {fileName && <p><strong>File Name:</strong> {fileName}</p>}
                 </div>
               )}
+
               {activeTab === "fonts" && (
-                <div><p>Here you can list fonts used in the PDF.</p></div>
+                <div>
+                  {fonts.length === 0 ? (
+                    <p>No font information available.</p>
+                  ) : (
+                    fonts.map((font, index) => (
+                      <div key={index} style={{ marginBottom: "1rem" }}>
+                        <p><strong>Font Name:</strong> {font.fontName}</p>
+                        <p><strong>Type:</strong> {font.type}</p>
+                        <p><strong>Encoding:</strong> {font.encoding}</p>
+                        <p><strong>Actual Font:</strong> {font.actualFont}</p>
+                        <p><strong>Actual Font Type:</strong> {font.actualFontType}</p>
+                        <hr />
+                      </div>
+                    ))
+                  )}
+                </div>
               )}
+
               {activeTab === "info" && (
                 <div><p>Additional metadata or document info goes here.</p></div>
               )}
