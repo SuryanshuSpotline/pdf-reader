@@ -1,57 +1,54 @@
 import dotenv from 'dotenv';
-import axios from 'axios';
-import PDFServicesSdk from '@adobe/pdfservices-node-sdk';
 import fs from 'fs';
 import path from 'path';
-import { getAdobeAccessToken } from './getAdobeAccessToken.js';
 import AdmZip from 'adm-zip';
+import axios from 'axios';
+import FormData from 'form-data';
+import { getAdobeAccessToken } from './getAdobeAccessToken.js';
 
 dotenv.config();
 
-async function extractFontsFromPDF(pdfFilePath) {
-  const adobeAccessToken = await getAdobeAccessToken();
+export async function extractFontsFromPDF(pdfFilePath) {
+  const accessToken = await getAdobeAccessToken();
 
-  const credentials = PDFServicesSdk.Credentials
-    .serviceAccountCredentialsBuilder()
-    .fromJSON({
-      access_token: adobeAccessToken,
-    })
-    .build();
+  const form = new FormData();
+  form.append('file', fs.createReadStream(pdfFilePath));
+  form.append('options', JSON.stringify({
+    elementsToExtract: ['text', 'fonts']
+  }));
 
-  const executionContext = PDFServicesSdk.ExecutionContext.create(credentials);
-  const extractPDFOperation = PDFServicesSdk.ExtractPDF.Operation.createNew();
+  const outputZipPath = path.join(path.dirname(pdfFilePath), 'result.zip');
 
-  const input = PDFServicesSdk.FileRef.createFromLocalFile(
-    pdfFilePath,
-    PDFServicesSdk.ExtractPDF.SupportedSourceFormat.pdf
-  );
-  extractPDFOperation.setInput(input);
+  try {
+    const response = await axios.post(
+      'https://pdf-services.adobe.io/extractpdf',
+      form,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'x-api-key': process.env.ADOBE_CLIENT_ID,
+          ...form.getHeaders()
+        },
+        responseType: 'arraybuffer'
+      }
+    );
 
-  const options = new PDFServicesSdk.ExtractPDF.options.ExtractPDFOptions.Builder()
-    .addElementsToExtract(
-      PDFServicesSdk.ExtractPDF.options.ExtractElementType.TEXT,
-      PDFServicesSdk.ExtractPDF.options.ExtractElementType.FONT
-    )
-    .build();
+    fs.writeFileSync(outputZipPath, response.data);
 
-  extractPDFOperation.setOptions(options);
+    const zip = new AdmZip(outputZipPath);
+    const jsonEntry = zip.getEntry('structuredData.json');
+    const structuredData = JSON.parse(jsonEntry.getData().toString('utf8'));
 
-  const result = await extractPDFOperation.execute(executionContext);
-  const outputPath = path.join(path.dirname(pdfFilePath), 'result.zip');
-  await result.saveAsFile(outputPath);
+    const fonts = new Set();
+    structuredData.elements.forEach(el => {
+      if (el.Font) {
+        fonts.add(el.Font);
+      }
+    });
 
-  const zip = new AdmZip(outputPath);
-  const jsonEntry = zip.getEntry('structuredData.json');
-  const structuredData = JSON.parse(jsonEntry.getData().toString('utf8'));
-
-  const fonts = new Set();
-  structuredData.elements.forEach(el => {
-    if (el.Font) {
-      fonts.add(el.Font);
-    }
-  });
-
-  return Array.from(fonts);
+    return Array.from(fonts);
+  } catch (error) {
+    console.error('Error extracting fonts from PDF:', error.response?.data || error.message);
+    throw error;
+  }
 }
-
-export default extractFontsFromPDF;

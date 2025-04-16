@@ -4,6 +4,9 @@ import path from "path";
 import fs from "fs";
 import cors from "cors";
 import extractFonts from "./extractFonts.js";  // Import the font extraction function
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,7 +26,6 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
-
 const upload = multer({ storage });
 
 app.get("/", (req, res) => {
