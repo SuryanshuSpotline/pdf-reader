@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import cors from "cors";
-import extractFonts from "./extractFonts";  // Import the font extraction function
+import extractFonts from "./extractFonts.js";  // Import the font extraction function
 
 const app = express();
 const PORT = process.env.PORT || 3000;
