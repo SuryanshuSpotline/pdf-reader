@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import cors from "cors";
-import extractFontsFromPDF from "./extractFonts.js";  // Import the font extraction function
+import { extractFontsFromPDF } from './extractFonts.js';  // Import the font extraction function
 import dotenv from "dotenv";
 
 dotenv.config();
