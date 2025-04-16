@@ -6,7 +6,7 @@ import { uploadFile } from "./file-upload";
 const PdfViewerComponent = () => {
   const [fileUrl, setFileUrl] = useState(localStorage.getItem("pdfUrl") || null);
   const [fileName, setFileName] = useState(localStorage.getItem("pdfName") || null);
-  const [fonts, setFonts] = useState([]); // Store fonts data
+  const [fontsData, setFontsData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
   const adobeClientId = process.env.REACT_APP_ADOBE_CLIENT_ID;
@@ -61,7 +61,7 @@ const PdfViewerComponent = () => {
       console.log("File uploaded successfully:", uploadedFile.url);
       setFileUrl(uploadedFile.url);
       setFileName(uploadedFile.name);
-      setFonts(uploadedFile.fonts || []); // Store fonts data
+      setFontsData(uploadedFile.fonts || []); // Store fonts data
       localStorage.setItem("pdfUrl", uploadedFile.url);
       localStorage.setItem("pdfName", uploadedFile.name);
     } else {
