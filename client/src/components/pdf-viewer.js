@@ -75,7 +75,7 @@ const PdfViewerComponent = () => {
   const fetchFonts = async (fileUrl) => {
     try {
       const response = await axios.post(
-        "https://pdf-reader-9eok.onrender.com/extract-fonts", 
+        "https://pdf-reader-9eok.onrender.com/upload", 
         { pdfUrl: fileUrl }
       );
       if (response.data && response.data.fonts) {
