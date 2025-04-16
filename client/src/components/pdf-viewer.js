@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./pdf-viewer.css";
 import { FaInfoCircle, FaFileUpload } from "react-icons/fa";
 import { uploadFile } from "./file-upload";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, PDFName, PDFDict } from "pdf-lib";
 
 const PdfViewerComponent = () => {
   const [fileUrl, setFileUrl] = useState(localStorage.getItem("pdfUrl") || null);
@@ -64,35 +64,36 @@ const PdfViewerComponent = () => {
       localStorage.setItem("pdfUrl", uploadedFile.url);
       localStorage.setItem("pdfName", uploadedFile.name);
 
-      // Load file locally to extract fonts
       const reader = new FileReader();
       reader.onload = async () => {
-        const typedArray = new Uint8Array(reader.result);
-        const pdfDoc = await PDFDocument.load(typedArray);
-        const fontSet = new Set();
-        const fontsList = [];
+        try {
+          const typedArray = new Uint8Array(reader.result);
+          const pdfDoc = await PDFDocument.load(typedArray);
+          const fontsList = [];
+          const fontSet = new Set();
 
-        const pages = pdfDoc.getPages();
-        for (const page of pages) {
-          const dict = page.node.Resources();
-          const fontsDict = dict.lookup("Font");
-          if (!fontsDict) continue;
+          for (const page of pdfDoc.getPages()) {
+            const resources = page.node.get(PDFName.of("Resources"));
+            if (!(resources instanceof PDFDict)) continue;
 
-          fontsDict.entries().forEach(([key, value]) => {
-            const fontRef = value;
-            const fontDict = fontRef.lookupMaybe("BaseFont") ? fontRef : fontRef.lookupMaybe("FontDescriptor");
+            const fontsDict = resources.lookup(PDFName.of("Font"), PDFDict);
+            if (!(fontsDict instanceof PDFDict)) continue;
 
-            if (fontDict && fontDict.dict) {
-              const fontName = fontRef.lookupMaybe("BaseFont")?.name ?? "Unknown";
-              const fontType = fontRef.lookupMaybe("Subtype")?.name ?? "Unknown";
-              const encoding = fontRef.lookupMaybe("Encoding")?.name ?? "Unknown";
+            for (const [key, fontRef] of fontsDict.entries()) {
+              const fontName = fontRef.lookupMaybe(PDFName.of("BaseFont"))?.name ?? "Unknown";
+              const fontType = fontRef.lookupMaybe(PDFName.of("Subtype"))?.name ?? "Unknown";
+              const descriptor = fontRef.lookupMaybe(PDFName.of("FontDescriptor"), PDFDict);
+              let actualFont = "Unknown";
+              let actualFontType = "Unknown";
 
-              const actualFont = fontDict.lookupMaybe("FontName")?.name ?? "Unknown";
-              const actualFontType = fontDict.lookupMaybe("FontFile2")
-                ? "TrueType"
-                : fontDict.lookupMaybe("FontFile3")
-                ? "Type1 or CID"
-                : "Unknown";
+              if (descriptor instanceof PDFDict) {
+                actualFont = descriptor.lookupMaybe(PDFName.of("FontName"))?.name ?? "Unknown";
+                actualFontType = descriptor.has(PDFName.of("FontFile2"))
+                  ? "TrueType"
+                  : descriptor.has(PDFName.of("FontFile3"))
+                  ? "Type1 or CID"
+                  : "Unknown";
+              }
 
               const fontKey = `${fontName}-${actualFont}`;
               if (!fontSet.has(fontKey)) {
@@ -100,15 +101,17 @@ const PdfViewerComponent = () => {
                 fontsList.push({
                   fontName,
                   type: fontType,
-                  encoding,
                   actualFont,
                   actualFontType,
                 });
               }
             }
-          });
+          }
+
+          setFonts(fontsList);
+        } catch (error) {
+          console.error("Error while extracting fonts:", error);
         }
-        setFonts(fontsList);
       };
       reader.readAsArrayBuffer(selectedFile);
     } else {
@@ -139,7 +142,6 @@ const PdfViewerComponent = () => {
         <FaFileUpload size={24} title="Upload Document" />
       </label>
 
-      {/* Modal */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
@@ -170,7 +172,6 @@ const PdfViewerComponent = () => {
                       <div key={index} style={{ marginBottom: "1rem" }}>
                         <p><strong>Font Name:</strong> {font.fontName}</p>
                         <p><strong>Type:</strong> {font.type}</p>
-                        <p><strong>Encoding:</strong> {font.encoding}</p>
                         <p><strong>Actual Font:</strong> {font.actualFont}</p>
                         <p><strong>Actual Font Type:</strong> {font.actualFontType}</p>
                         <hr />
