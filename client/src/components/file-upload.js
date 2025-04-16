@@ -11,8 +11,11 @@ export const uploadFile = async (file) => {
       { headers: { "Content-Type": "multipart/form-data" } }
     );
 
-    if (response.data.url) {
-      return `https://pdf-reader-9eok.onrender.com${response.data.url}`;
+    if (response.data.url && response.data.originalName) {
+      return {
+        url: `https://pdf-reader-9eok.onrender.com${response.data.url}`,
+        name: response.data.originalName,
+      };
     } else {
       console.error("Upload failed.");
       return null;

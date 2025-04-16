@@ -35,7 +35,7 @@ app.post("/upload", upload.single("pdf"), (req, res) => {
   }
 
   const fileUrl = `/uploads/${req.file.filename}`;
-  res.json({ url: fileUrl });
+  res.json({ url: fileUrl, originalName: req.file.originalname, });
 });
 
 app.use("/uploads", express.static(uploadDir));

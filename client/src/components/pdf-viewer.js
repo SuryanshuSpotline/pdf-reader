@@ -5,6 +5,9 @@ import { uploadFile } from "./file-upload";
 
 const PdfViewerComponent = () => {
   const [fileUrl, setFileUrl] = useState(localStorage.getItem("pdfUrl") || null);
+  const [fileName, setFileName] = useState(localStorage.getItem("pdfName") || null);
+  const [showModal, setShowModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("description");
   const adobeClientId = process.env.REACT_APP_ADOBE_CLIENT_ID;
 
   useEffect(() => {
@@ -20,7 +23,6 @@ const PdfViewerComponent = () => {
       }
 
       console.log("Adobe SDK Loaded, Initializing Viewer...");
-
       const adobeDCView = new window.AdobeDC.View({
         clientId: adobeClientId,
         divId: "adobe-dc-view",
@@ -29,7 +31,7 @@ const PdfViewerComponent = () => {
       adobeDCView.previewFile(
         {
           content: { location: { url: pdfUrl } },
-          metaData: { fileName: "Bodea Brochure.pdf" },
+          metaData: { fileName: fileName || "Uploaded Document.pdf" },
         },
         { embedMode: "FULL_WINDOW" }
       );
@@ -45,19 +47,21 @@ const PdfViewerComponent = () => {
     }, 500);
 
     return () => clearInterval(checkAdobeSDK);
-  }, [fileUrl, adobeClientId]);
+  }, [fileUrl, fileName, adobeClientId]);
 
   const handleFileChange = async (event) => {
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
 
     console.log("Uploading file...");
-    const uploadedFileUrl = await uploadFile(selectedFile);
+    const uploadedFile = await uploadFile(selectedFile);
 
-    if (uploadedFileUrl) {
-      console.log("File uploaded successfully:", uploadedFileUrl);
-      setFileUrl(uploadedFileUrl);
-      localStorage.setItem("pdfUrl", uploadedFileUrl);
+    if (uploadedFile) {
+      console.log("File uploaded successfully:", uploadedFile.url);
+      setFileUrl(uploadedFile.url);
+      setFileName(uploadedFile.name);
+      localStorage.setItem("pdfUrl", uploadedFile.url);
+      localStorage.setItem("pdfName", uploadedFile.name);
     } else {
       console.error("File upload failed.");
     }
@@ -66,12 +70,58 @@ const PdfViewerComponent = () => {
   return (
     <div className="pdf-container">
       <div id="adobe-dc-view"></div>
-      <div className="info-icon" selenium-name="doc-info">
+
+      <div
+        className="info-icon"
+        selenium-name="doc-info"
+        onClick={() => setShowModal(true)}
+        style={{ cursor: "pointer" }}
+      >
         <FaInfoCircle size={24} title="More Information" />
       </div>
-      <label className="upload-icon" selenium-name="file-upload"><input type="file"accept="application/pdf" onChange={handleFileChange} style={{ display: "none" }}/>
+
+      <label className="upload-icon" selenium-name="file-upload">
+        <input
+          type="file"
+          accept="application/pdf"
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
         <FaFileUpload size={24} title="Upload Document" />
       </label>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h3>Document Information</h3>
+              <button className="close-button" onClick={() => setShowModal(false)}>×</button>
+            </div>
+
+            <div className="tabs">
+              <button onClick={() => setActiveTab("description")} className={activeTab === "description" ? "active" : ""}>Description</button>
+              <button onClick={() => setActiveTab("fonts")} className={activeTab === "fonts" ? "active" : ""}>Fonts</button>
+              <button onClick={() => setActiveTab("info")} className={activeTab === "info" ? "active" : ""}>Info</button>
+            </div>
+
+            <div className="tab-content">
+              {activeTab === "description" && (
+                <div>
+                  <p>This is the description of the uploaded PDF.</p>
+                  {fileName && <p><strong>File Name:</strong> {fileName}</p>}
+                </div>
+              )}
+              {activeTab === "fonts" && (
+                <div><p>Here you can list fonts used in the PDF.</p></div>
+              )}
+              {activeTab === "info" && (
+                <div><p>Additional metadata or document info goes here.</p></div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
