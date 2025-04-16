@@ -1,54 +1,79 @@
-import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-import AdmZip from 'adm-zip';
-import axios from 'axios';
-import FormData from 'form-data';
-import { getAdobeAccessToken } from './getAdobeAccessToken.js';
-
-dotenv.config();
-
-export async function extractFontsFromPDF(pdfFilePath) {
-  const accessToken = await getAdobeAccessToken();
-
-  const form = new FormData();
-  form.append('file', fs.createReadStream(pdfFilePath));
-  form.append('options', JSON.stringify({
-    elementsToExtract: ['text', 'fonts']
-  }));
-
-  const outputZipPath = path.join(path.dirname(pdfFilePath), 'result.zip');
-
-  try {
-    const response = await axios.post(
-      'https://pdf-services.adobe.io/extractpdf',
-      form,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'x-api-key': process.env.ADOBE_CLIENT_ID,
-          ...form.getHeaders()
-        },
-        responseType: 'arraybuffer'
-      }
-    );
-
-    fs.writeFileSync(outputZipPath, response.data);
-
-    const zip = new AdmZip(outputZipPath);
-    const jsonEntry = zip.getEntry('structuredData.json');
-    const structuredData = JSON.parse(jsonEntry.getData().toString('utf8'));
-
-    const fonts = new Set();
-    structuredData.elements.forEach(el => {
-      if (el.Font) {
-        fonts.add(el.Font);
-      }
-    });
-
-    return Array.from(fonts);
-  } catch (error) {
-    console.error('Error extracting fonts from PDF:', error.response?.data || error.message);
-    throw error;
+const {
+    ServicePrincipalCredentials,
+    PDFServices,
+    MimeType,
+    ExtractPDFParams,
+    ExtractElementType,
+    ExtractPDFJob,
+    ExtractPDFResult
+  } = require("@adobe/pdfservices-node-sdk");
+  
+  const fs = require("fs");
+  const AdmZip = require("adm-zip");
+  const path = require("path");
+  const dotenv = require("dotenv");
+  
+  dotenv.config();
+  
+  async function extractFontsFromPDF(inputFilePath) {
+    let readStream;
+    try {
+      const credentials = new ServicePrincipalCredentials({
+        clientId: process.env.PDF_SERVICES_CLIENT_ID,
+        clientSecret: process.env.PDF_SERVICES_CLIENT_SECRET,
+      });
+  
+      const pdfServices = new PDFServices({ credentials });
+  
+      readStream = fs.createReadStream(inputFilePath);
+      const inputAsset = await pdfServices.upload({
+        readStream,
+        mimeType: MimeType.PDF,
+      });
+  
+      const params = new ExtractPDFParams({
+        elementsToExtract: [ExtractElementType.TEXT],
+        includeFontInfo: true,
+      });
+  
+      const job = new ExtractPDFJob({ inputAsset, params });
+      const pollingURL = await pdfServices.submit({ job });
+      const pdfServicesResponse = await pdfServices.getJobResult({
+        pollingURL,
+        resultType: ExtractPDFResult,
+      });
+  
+      const resultAsset = pdfServicesResponse.result.resource;
+      const streamAsset = await pdfServices.getContent({ asset: resultAsset });
+      fs.mkdirSync("outputs", { recursive: true });
+      const tempOutputPath = path.join("outputs", `${Date.now()}-Extract.zip`);
+      const writeStream = fs.createWriteStream(tempOutputPath);
+      streamAsset.readStream.pipe(writeStream);
+  
+      await new Promise((resolve) => writeStream.on("finish", resolve));
+  
+      const zip = new AdmZip(tempOutputPath);
+      const jsonData = zip.readAsText("structuredData.json");
+      const data = JSON.parse(jsonData);
+  
+      const fontsUsed = new Set();
+  
+      data.elements.forEach((element) => {
+        if (element.Font) {
+          fontsUsed.add(element.Font);
+        }
+      });
+  
+      // Cleanup
+      fs.unlinkSync(tempOutputPath);
+  
+      return Array.from(fontsUsed);
+    } catch (err) {
+      console.error("Error during font extraction:", err);
+      return [];
+    } finally {
+      readStream?.destroy();
+    }
   }
-}
+  
+  module.exports = extractFontsFromPDF;  

@@ -1,10 +1,10 @@
-import express from "express";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-import cors from "cors";
-import { extractFontsFromPDF } from './extractFonts.js';  // Import the font extraction function
-import dotenv from "dotenv";
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const extractFontsFromPDF = require("./extractFonts.js");  // Use require instead of import
 
 dotenv.config();
 
@@ -34,6 +34,9 @@ app.get("/", (req, res) => {
 
 app.post("/upload", upload.single("pdf"), async (req, res) => {
   if (!req.file) {
+    console.log("Received request to /upload");
+    console.log("Request file:", req.file);
+    console.log("Request body:", req.body);
     return res.status(400).json({ error: "No file uploaded" });
   }
 
@@ -44,15 +47,23 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
     // Extract fonts from the uploaded PDF
     const fonts = await extractFontsFromPDF(filePath);
 
+    // If fonts are not found, set it to 'none'
+    const fontResponse = fonts.length > 0 ? fonts : ['none'];
+
     // Send the fonts data in the response
     res.json({
       url: fileUrl,
       originalName: req.file.originalname,
-      fonts: fonts,  // Send the extracted fonts
+      fonts: fontResponse,  // Send the extracted fonts or 'none'
     });
   } catch (error) {
     console.error("Error extracting fonts:", error);
-    res.status(500).json({ error: "Failed to extract fonts from PDF" });
+    res.status(500).json({
+      error: "Failed to extract fonts from PDF",
+      url: fileUrl,
+      originalName: req.file.originalname,
+      fonts: ['none'],  // If extraction fails, return 'none'
+    });
   }
 });
 
