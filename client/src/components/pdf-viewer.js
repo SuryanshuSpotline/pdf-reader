@@ -98,7 +98,9 @@ const PdfViewerComponent = () => {
           <div className="modal">
             <div className="modal-header">
               <h3>Document Information</h3>
-              <button className="close-button" onClick={() => setShowModal(false)}>×</button>
+              <button className="close-button" onClick={() => setShowModal(false)}>
+                ×
+              </button>
             </div>
 
             <div className="tabs">
@@ -115,15 +117,23 @@ const PdfViewerComponent = () => {
                 </div>
               )}
               {activeTab === "fonts" && (
-                <div>
-                  {fonts.length > 0 ? (
-                    <ul>
-                      {fonts.map((font, index) => (
-                        <li key={index}>{font.name}</li> // Assuming fonts have a 'name' property
-                      ))}
-                    </ul>
+                <div className="font-list">
+                  {fontsData.length === 0 ? (
+                    <p>No font data available.</p>
                   ) : (
-                    <p>No fonts found for this document.</p>
+                    fontsData.map((font, index) => (
+                      <div key={index} className="font-item">
+                        <p><strong>Font Name:</strong> {font.name}</p>
+                        <p><strong>Family Name:</strong> {font.family_name}</p>
+                        <p><strong>Embedded:</strong> {font.embedded ? "Yes" : "No"}</p>
+                        <p><strong>Encoding:</strong> {font.encoding}</p>
+                        <p><strong>Font Type:</strong> {font.font_type}</p>
+                        <p><strong>Italic:</strong> {font.italic ? "Yes" : "No"}</p>
+                        <p><strong>Monospaced:</strong> {font.monospaced ? "Yes" : "No"}</p>
+                        <p><strong>Weight:</strong> {font.weight}</p>
+                        <hr />
+                      </div>
+                    ))
                   )}
                 </div>
               )}
