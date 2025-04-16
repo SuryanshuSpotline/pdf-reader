@@ -4,7 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const extractFontsFromPDF = require("./extractFonts.js");  // Use require instead of import
+const extractFontsFromPDF = require("./extractFonts.js");
 
 dotenv.config();
 
@@ -19,12 +19,8 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
 });
 const upload = multer({ storage });
 
@@ -33,42 +29,42 @@ app.get("/", (req, res) => {
 });
 
 app.post("/upload", upload.single("pdf"), async (req, res) => {
+  console.log("Incoming /upload request");
+
   if (!req.file) {
-    console.log("Received request to /upload");
-    console.log("Request file:", req.file);
-    console.log("Request body:", req.body);
+    console.warn("No file uploaded in the request");
     return res.status(400).json({ error: "No file uploaded" });
   }
 
-  const fileUrl = `/uploads/${req.file.filename}`;
   const filePath = path.join(uploadDir, req.file.filename);
-  
+  const fileUrl = `/uploads/${req.file.filename}`;
+  console.log(`Received file: ${req.file.originalname}`);
+
   try {
-    // Extract fonts from the uploaded PDF
     const fonts = await extractFontsFromPDF(filePath);
+    const fontResponse = fonts.length > 0 ? fonts : ["none"];
 
-    // If fonts are not found, set it to 'none'
-    const fontResponse = fonts.length > 0 ? fonts : ['none'];
-
-    // Send the fonts data in the response
     res.json({
       url: fileUrl,
       originalName: req.file.originalname,
-      fonts: fontResponse,  // Send the extracted fonts or 'none'
+      fonts: fontResponse,
     });
   } catch (error) {
-    console.error("Error extracting fonts:", error);
+    console.error("❌ Error during font extraction:", error.message);
+
     res.status(500).json({
       error: "Failed to extract fonts from PDF",
       url: fileUrl,
       originalName: req.file.originalname,
-      fonts: ['none'],  // If extraction fails, return 'none'
+      fonts: ["none"],
     });
+  } finally {
+    fs.unlinkSync(filePath);
   }
 });
 
 app.use("/uploads", express.static(uploadDir));
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
