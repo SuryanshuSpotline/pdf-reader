@@ -6,6 +6,7 @@ import { uploadFile } from "./file-upload";
 const PdfViewerComponent = () => {
   const [fileUrl, setFileUrl] = useState(localStorage.getItem("pdfUrl") || null);
   const [fileName, setFileName] = useState(localStorage.getItem("pdfName") || null);
+  const [fonts, setFonts] = useState([]); // Store fonts data
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
   const adobeClientId = process.env.REACT_APP_ADOBE_CLIENT_ID;
@@ -60,6 +61,7 @@ const PdfViewerComponent = () => {
       console.log("File uploaded successfully:", uploadedFile.url);
       setFileUrl(uploadedFile.url);
       setFileName(uploadedFile.name);
+      setFonts(uploadedFile.fonts || []); // Store fonts data
       localStorage.setItem("pdfUrl", uploadedFile.url);
       localStorage.setItem("pdfName", uploadedFile.name);
     } else {
@@ -113,7 +115,17 @@ const PdfViewerComponent = () => {
                 </div>
               )}
               {activeTab === "fonts" && (
-                <div><p>Here you can list fonts used in the PDF.</p></div>
+                <div>
+                  {fonts.length > 0 ? (
+                    <ul>
+                      {fonts.map((font, index) => (
+                        <li key={index}>{font.name}</li> // Assuming fonts have a 'name' property
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No fonts found for this document.</p>
+                  )}
+                </div>
               )}
               {activeTab === "info" && (
                 <div><p>Additional metadata or document info goes here.</p></div>

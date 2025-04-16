@@ -15,6 +15,7 @@ export const uploadFile = async (file) => {
       return {
         url: `https://pdf-reader-9eok.onrender.com${response.data.url}`,
         name: response.data.originalName,
+        fonts: response.data.fonts,
       };
     } else {
       console.error("Upload failed.");
