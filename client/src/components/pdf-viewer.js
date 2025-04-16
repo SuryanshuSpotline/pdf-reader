@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import "./pdf-viewer.css";
 import { FaInfoCircle, FaFileUpload } from "react-icons/fa";
 import { uploadFile } from "./file-upload";
-import axios from "axios";
 
 const PdfViewerComponent = () => {
   const [fileUrl, setFileUrl] = useState(localStorage.getItem("pdfUrl") || null);
   const [fileName, setFileName] = useState(localStorage.getItem("pdfName") || null);
-  const [fonts, setFonts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
   const adobeClientId = process.env.REACT_APP_ADOBE_CLIENT_ID;
@@ -64,27 +62,8 @@ const PdfViewerComponent = () => {
       setFileName(uploadedFile.name);
       localStorage.setItem("pdfUrl", uploadedFile.url);
       localStorage.setItem("pdfName", uploadedFile.name);
-
-      // After upload, extract fonts from the PDF
-      await fetchFonts(uploadedFile.url);
     } else {
       console.error("File upload failed.");
-    }
-  };
-
-  const fetchFonts = async (fileUrl) => {
-    try {
-      const response = await axios.post(
-        "https://pdf-reader-9eok.onrender.com/upload", 
-        { pdfUrl: fileUrl }
-      );
-      if (response.data && response.data.fonts) {
-        setFonts(response.data.fonts);
-      } else {
-        console.error("Font extraction failed.");
-      }
-    } catch (error) {
-      console.error("Error fetching fonts:", error);
     }
   };
 
@@ -134,18 +113,7 @@ const PdfViewerComponent = () => {
                 </div>
               )}
               {activeTab === "fonts" && (
-                <div>
-                  <h4>Fonts Used:</h4>
-                  {fonts.length > 0 ? (
-                    <ul>
-                      {fonts.map((font, index) => (
-                        <li key={index}>{font}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>No fonts found or the font extraction failed.</p>
-                  )}
-                </div>
+                <div><p>Here you can list fonts used in the PDF.</p></div>
               )}
               {activeTab === "info" && (
                 <div><p>Additional metadata or document info goes here.</p></div>
