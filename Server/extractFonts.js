@@ -65,7 +65,7 @@ const {
         }
       });
   
-      fs.unlinkSync(tempOutputPath); // Clean up temp file
+      fs.unlinkSync(tempOutputPath);
   
       return Array.from(fontMap.values());
     } catch (err) {

@@ -41,7 +41,6 @@ router.post("/extract-fonts", upload.single("pdf"), async (req, res) => {
       details: err.message,
     });
   } finally {
-    // Optional: delete uploaded file after processing
     fs.unlinkSync(filePath);
   }
 });

@@ -59,12 +59,11 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
       fonts: ["none"],
     });
   } finally {
-    // fs.unlinkSync(filePath);
   }
 });
 
 app.use("/uploads", express.static(uploadDir));
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
