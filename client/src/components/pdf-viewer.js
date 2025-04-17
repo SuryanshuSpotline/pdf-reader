@@ -7,6 +7,7 @@ const PdfViewerComponent = () => {
   const [fileUrl, setFileUrl] = useState(localStorage.getItem("pdfUrl") || null);
   const [fileName, setFileName] = useState(localStorage.getItem("pdfName") || null);
   const [fontsData, setFontsData] = useState([]);
+  const [documentProperties, setDocumentProperties] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
   const adobeClientId = process.env.REACT_APP_ADOBE_CLIENT_ID;
@@ -61,7 +62,8 @@ const PdfViewerComponent = () => {
       console.log("File uploaded successfully:", uploadedFile.url);
       setFileUrl(uploadedFile.url);
       setFileName(uploadedFile.name);
-      setFontsData(uploadedFile.fonts || []); // Store fonts data
+      setFontsData(uploadedFile.fonts || []);
+      setDocumentProperties(uploadedFile.properties || {});
       localStorage.setItem("pdfUrl", uploadedFile.url);
       localStorage.setItem("pdfName", uploadedFile.name);
     } else {
@@ -106,14 +108,21 @@ const PdfViewerComponent = () => {
             <div className="tabs">
               <button onClick={() => setActiveTab("description")} className={activeTab === "description" ? "active" : ""}>Description</button>
               <button onClick={() => setActiveTab("fonts")} className={activeTab === "fonts" ? "active" : ""}>Fonts</button>
-              <button onClick={() => setActiveTab("info")} className={activeTab === "info" ? "active" : ""}>Info</button>
+              {/* <button onClick={() => setActiveTab("info")} className={activeTab === "info" ? "active" : ""}>Info</button> */}
             </div>
 
             <div className="tab-content">
               {activeTab === "description" && (
                 <div>
-                  <p>This is the description of the uploaded PDF.</p>
+                  {/* <p>This is the description of the uploaded PDF.</p> */}
                   {fileName && <p><strong>File Name:</strong> {fileName}</p>}
+                  {documentProperties && (
+                    <div>
+                      <p><strong>File Size:</strong> {documentProperties.fileSize} bytes</p>
+                      <p><strong>PDF Version:</strong> {documentProperties.pdfVersion}</p>
+                      <p><strong>Page Count:</strong> {documentProperties.pageCount}</p>
+                    </div>
+                  )}
                 </div>
               )}
               {activeTab === "fonts" && (
@@ -137,9 +146,9 @@ const PdfViewerComponent = () => {
                   )}
                 </div>
               )}
-              {activeTab === "info" && (
+              {/* {activeTab === "info" && (
                 <div><p>Additional metadata or document info goes here.</p></div>
-              )}
+              )} */}
             </div>
           </div>
         </div>

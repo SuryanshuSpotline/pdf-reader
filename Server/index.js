@@ -4,7 +4,8 @@ const path = require("path");
 const fs = require("fs");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const extractFontsFromPDF = require("./extractFonts.js");
+const extractPDFProperties = require("./extractPDFProperties");
+const extractPDFPropertiesAPI = require("./extractPDFPropertiesAPI");
 
 dotenv.config();
 
@@ -24,6 +25,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+app.use("/extract", extractPDFPropertiesAPI);
+
 app.get("/", (req, res) => {
   res.json({ message: "V-Assure PDF Reader API is running!" });
 });
@@ -41,24 +44,25 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
   console.log(`Received file: ${req.file.originalname}`);
 
   try {
-    const fonts = await extractFontsFromPDF(filePath);
+    const { fonts, properties } = await extractPDFProperties(filePath);
     const fontResponse = fonts.length > 0 ? fonts : ["none"];
 
     res.json({
       url: fileUrl,
       originalName: req.file.originalname,
       fonts: fontResponse,
+      properties,
     });
   } catch (error) {
-    console.error("❌ Error during font extraction:", error.message);
+    console.error("Error during font extraction or properties fetching:", error.message);
 
     res.status(500).json({
-      error: "Failed to extract fonts from PDF",
+      error: "Failed to extract fonts or properties from PDF",
       url: fileUrl,
       originalName: req.file.originalname,
       fonts: ["none"],
+      properties: null,
     });
-  } finally {
   }
 });
 
