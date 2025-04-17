@@ -108,17 +108,15 @@ const PdfViewerComponent = () => {
             <div className="tabs">
               <button onClick={() => setActiveTab("description")} className={activeTab === "description" ? "active" : ""}>Description</button>
               <button onClick={() => setActiveTab("fonts")} className={activeTab === "fonts" ? "active" : ""}>Fonts</button>
-              {/* <button onClick={() => setActiveTab("info")} className={activeTab === "info" ? "active" : ""}>Info</button> */}
             </div>
 
             <div className="tab-content">
               {activeTab === "description" && (
                 <div>
-                  {/* <p>This is the description of the uploaded PDF.</p> */}
                   {fileName && <p><strong>File Name:</strong> {fileName}</p>}
                   {documentProperties && (
                     <div>
-                      <p><strong>File Size:</strong> {documentProperties.fileSize} bytes</p>
+                      <p><strong>File Size:</strong> {documentProperties.fileSize}</p>
                       <p><strong>PDF Version:</strong> {documentProperties.pdfVersion}</p>
                       <p><strong>Page Count:</strong> {documentProperties.pageCount}</p>
                     </div>
@@ -146,9 +144,6 @@ const PdfViewerComponent = () => {
                   )}
                 </div>
               )}
-              {/* {activeTab === "info" && (
-                <div><p>Additional metadata or document info goes here.</p></div>
-              )} */}
             </div>
           </div>
         </div>
