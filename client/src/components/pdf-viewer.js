@@ -129,34 +129,34 @@ const PdfViewerComponent = () => {
                     <p>No font data available.</p>
                   ) : (
                     fontsData.map((font, index) => (
-                      <div key={index} className="font-item overflow-x-auto mb-4">
-                        <table className="table-auto border-collapse border border-gray-400 w-full text-left">
-                          <thead className="bg-gray-100">
-                            <tr>
-                              <th className="border border-gray-300 p-2 font-bold">Font Name</th>
-                              <th className="border border-gray-300 p-2 font-bold">Family Name</th>
-                              <th className="border border-gray-300 p-2 font-bold">Embedded</th>
-                              <th className="border border-gray-300 p-2 font-bold">Encoding</th>
-                              <th className="border border-gray-300 p-2 font-bold">Font Type</th>
-                              <th className="border border-gray-300 p-2 font-bold">Italic</th>
-                              <th className="border border-gray-300 p-2 font-bold">Monospaced</th>
-                              <th className="border border-gray-300 p-2 font-bold">Weight</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td className="border border-gray-300 p-2">{font.name}</td>
-                              <td className="border border-gray-300 p-2">{font.family_name}</td>
-                              <td className="border border-gray-300 p-2">{font.embedded ? "Yes" : "No"}</td>
-                              <td className="border border-gray-300 p-2">{font.encoding}</td>
-                              <td className="border border-gray-300 p-2">{font.font_type}</td>
-                              <td className="border border-gray-300 p-2">{font.italic ? "Yes" : "No"}</td>
-                              <td className="border border-gray-300 p-2">{font.monospaced ? "Yes" : "No"}</td>
-                              <td className="border border-gray-300 p-2">{font.weight}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                        <div key={index} className="font-item overflow-x-auto mb-4">
+                          <table className="table-auto border-collapse border border-gray-400 w-full text-left">
+                            <thead className="bg-gray-100">
+                              <tr>
+                                <th className="border border-gray-300 p-2 font-bold">Font Name</th>
+                                <th className="border border-gray-300 p-2 font-bold">Family Name</th>
+                                <th className="border border-gray-300 p-2 font-bold">Embedded</th>
+                                <th className="border border-gray-300 p-2 font-bold">Encoding</th>
+                                <th className="border border-gray-300 p-2 font-bold">Font Type</th>
+                                <th className="border border-gray-300 p-2 font-bold">Italic</th>
+                                <th className="border border-gray-300 p-2 font-bold">Monospaced</th>
+                                <th className="border border-gray-300 p-2 font-bold">Weight</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td className="border border-gray-300 p-2">{font.name}</td>
+                                <td className="border border-gray-300 p-2">{font.family_name}</td>
+                                <td className="border border-gray-300 p-2">{font.embedded ? "Yes" : "No"}</td>
+                                <td className="border border-gray-300 p-2">{font.encoding}</td>
+                                <td className="border border-gray-300 p-2">{font.font_type}</td>
+                                <td className="border border-gray-300 p-2">{font.italic ? "Yes" : "No"}</td>
+                                <td className="border border-gray-300 p-2">{font.monospaced ? "Yes" : "No"}</td>
+                                <td className="border border-gray-300 p-2">{font.weight}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
                     ))
                   )}
                 </div>
