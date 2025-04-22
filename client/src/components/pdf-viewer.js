@@ -144,7 +144,7 @@ const PdfViewerComponent = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {fonts.map((font, index) => (
+                            {fontsData.map((font, index) => (
                               <tr key={index}>
                                 <td>{font.name}</td>
                                 <td>{font.family_name}</td>
