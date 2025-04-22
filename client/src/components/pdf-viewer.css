@@ -98,6 +98,7 @@
 .font-table-wrapper {
   overflow-x: auto;
   margin-bottom: 20px;
+  max-height: 400px; /* Adjust this value as needed to create a scrollable table */
 }
 
 .font-table {
@@ -117,4 +118,13 @@
 .font-table th {
   background-color: #f2f2f2;
   font-weight: bold;
+  position: sticky;
+  top: 0; /* Freezes the header at the top */
+  z-index: 1; /* Ensures the header stays on top of the table content */
+}
+
+.font-table tbody {
+  display: block;
+  max-height: 300px; /* Adjust this value based on the desired scrollable area */
+  overflow-y: auto;
 }
