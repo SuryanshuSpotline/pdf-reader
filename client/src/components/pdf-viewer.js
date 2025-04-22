@@ -128,8 +128,7 @@ const PdfViewerComponent = () => {
                   {fontsData.length === 0 ? (
                     <p>No font data available.</p>
                   ) : (
-                    fontsData.map((font, index) => (
-                      <div className="font-table-wrapper">
+                    <div className="font-table-wrapper">
                         <table className="font-table">
                           <thead>
                             <tr>
@@ -159,7 +158,6 @@ const PdfViewerComponent = () => {
                           </tbody>
                         </table>
                       </div>
-                    ))
                   )}
                 </div>
               )}
