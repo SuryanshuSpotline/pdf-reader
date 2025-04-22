@@ -129,7 +129,7 @@ const PdfViewerComponent = () => {
                     <p>No font data available.</p>
                   ) : (
                     fontsData.map((font, index) => (
-                      <div key={index} className="font-item">
+                      <div className="font-table-wrapper">
                         <table className="font-table">
                           <thead>
                             <tr>
@@ -144,16 +144,18 @@ const PdfViewerComponent = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
-                              <td>{font.name}</td>
-                              <td>{font.family_name}</td>
-                              <td>{font.embedded ? "Yes" : "No"}</td>
-                              <td>{font.encoding}</td>
-                              <td>{font.font_type}</td>
-                              <td>{font.italic ? "Yes" : "No"}</td>
-                              <td>{font.monospaced ? "Yes" : "No"}</td>
-                              <td>{font.weight}</td>
-                            </tr>
+                            {fonts.map((font, index) => (
+                              <tr key={index}>
+                                <td>{font.name}</td>
+                                <td>{font.family_name}</td>
+                                <td>{font.embedded ? "Yes" : "No"}</td>
+                                <td>{font.encoding}</td>
+                                <td>{font.font_type}</td>
+                                <td>{font.italic ? "Yes" : "No"}</td>
+                                <td>{font.monospaced ? "Yes" : "No"}</td>
+                                <td>{font.weight}</td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </div>
